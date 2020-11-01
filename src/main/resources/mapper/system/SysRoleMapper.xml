@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.yuzhian.zero.server.system.mapper.SysRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.yuzhian.zero.server.system.model.SysRole">
+        <id column="role_id" property="roleId"/>
+        <result column="role" property="role"/>
+        <result column="description" property="description"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+    <select id="listRoleByUserId" resultType="java.lang.String">
+        select sr.role
+        from sys_account sa
+                 left join sys_account_role sar on sa.user_id = sar.user_id
+                 left join sys_role sr on sar.role_id = sr.role_id
+        where sa.user_id = #{userId}
+    </select>
+
+
+</mapper>
