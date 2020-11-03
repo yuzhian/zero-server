@@ -23,61 +23,49 @@ import java.util.concurrent.TimeUnit;
 public class RedisCacheSessionDAO extends EnterpriseCacheSessionDAO {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Override
-    protected Serializable doCreate(Session session) {
-        Serializable sessionId = super.doCreate(session);
-        redisTemplate.opsForValue().set(SystemConstants.SESSION_PREFIX + sessionId.toString(), session);
-        if (log.isDebugEnabled()) {
-            log.debug("session create, key: {}, value: {}", sessionId, session);
-        }
-        return sessionId;
+    private String getSessionId(Serializable sessionId) {
+        return SystemConstants.SESSION_PREFIX + sessionId.toString();
     }
 
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        Session session = super.doReadSession(SystemConstants.SESSION_PREFIX + sessionId.toString());
+        if (log.isDebugEnabled()) log.debug("read({})", sessionId);
+        Session session = super.doReadSession(getSessionId(sessionId));
         if (Objects.nonNull(session)) {
-            if (log.isDebugEnabled()) {
-                log.debug("session read by super, key: {}, value: {}", sessionId, session);
-            }
             return session;
         }
-        session = (Session) redisTemplate.opsForValue().get(SystemConstants.SESSION_PREFIX + sessionId.toString());
-        if (log.isDebugEnabled()) {
-            log.debug("session read by redis, key: {}, value: {}", sessionId, session);
-        }
+        session = (Session) redisTemplate.opsForValue().get(getSessionId(sessionId));
         return session;
+    }
+
+    @Override
+    protected Serializable doCreate(Session session) {
+        Serializable sessionId = super.doCreate(session);
+        if (log.isDebugEnabled()) log.debug("create({}, {})", session.getId(), session);
+        redisTemplate.opsForValue().set(getSessionId(sessionId), session);
+        return sessionId;
     }
 
     @Override
     protected void doUpdate(Session session) {
         super.doUpdate(session);
-        String key = SystemConstants.SESSION_PREFIX + session.getId().toString();
+        if (log.isDebugEnabled()) log.debug("update({}, {})", session.getId(), session);
+        String key = getSessionId(session.getId());
         if (redisTemplate.hasKey(key) != Boolean.TRUE) {
             redisTemplate.opsForValue().set(key, session);
         }
         redisTemplate.expire(key, SystemConstants.SESSION_EXPIRE, TimeUnit.SECONDS);
-        if (log.isDebugEnabled()) {
-            log.debug("session update, key: {}, value: {}", session.getId(), session);
-        }
     }
 
     @Override
     protected void doDelete(Session session) {
         super.doDelete(session);
-        redisTemplate.delete(SystemConstants.SESSION_PREFIX + session.getId().toString());
-        if (log.isDebugEnabled()) {
-            log.debug("session delete, key: {}", session.getId());
-        }
+        if (log.isDebugEnabled()) log.debug("delete({}, {})", session.getId(), session);
+        redisTemplate.delete(getSessionId(session.getId()));
     }
 
     @Override
     public Collection<Session> getActiveSessions() {
-        Collection<Session> sessions = super.getActiveSessions();
-        if (log.isDebugEnabled()) {
-            log.debug("session active size: {}", sessions.size());
-        }
-        return sessions;
+        return super.getActiveSessions();
     }
-
 }

@@ -52,9 +52,11 @@ public class ShiroConfig {
      * 会话管理器: 配置 Session 实现{@link RedisCacheSessionDAO}
      */
     @Bean
-    public SessionManager sessionManager(@Qualifier("redisCacheSessionDAO") SessionDAO sessionDAO) {
+    public SessionManager sessionManager(@Qualifier("redisCacheSessionDAO") SessionDAO sessionDAO,
+                                         @Qualifier("redisCacheManager") CacheManager cacheManager) {
         DefaultWebSessionManager sessionManager = new RedisSessionManager();
         sessionManager.setSessionDAO(sessionDAO);
+        sessionManager.setCacheManager(cacheManager);
         return sessionManager;
     }
 
@@ -66,12 +68,10 @@ public class ShiroConfig {
      */
     @Bean
     public DefaultSecurityManager securityManager(@Qualifier("authorizingRealm") AuthorizingRealm authorizingRealm,
-                                                  @Qualifier("sessionManager") SessionManager sessionManager,
-                                                  @Qualifier("redisCacheManager") CacheManager cacheManager) {
+                                                  @Qualifier("sessionManager") SessionManager sessionManager) {
         DefaultSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(authorizingRealm);
         securityManager.setSessionManager(sessionManager);
-        securityManager.setCacheManager(cacheManager);
         return securityManager;
     }
 

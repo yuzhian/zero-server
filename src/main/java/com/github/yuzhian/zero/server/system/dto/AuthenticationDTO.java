@@ -3,6 +3,7 @@ package com.github.yuzhian.zero.server.system.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 @Getter
 @Setter
+@ToString
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AuthenticationDTO implements Serializable {
     private static final long serialVersionUID = 1L;

@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RedisCacheManager implements CacheManager {
     @SuppressWarnings("rawtypes")
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate redisCacheTemplate;
 
     @Override
     public <K, V> Cache<K, V> getCache(String prefix) {
-        log.info("RedisCacheManager.getCache:prefix: {}", prefix);
-        return new RedisCache<>(redisTemplate);
+        if (log.isDebugEnabled()) log.debug("prefix: {}", prefix);
+        return new RedisCache<>(redisCacheTemplate);
     }
 }

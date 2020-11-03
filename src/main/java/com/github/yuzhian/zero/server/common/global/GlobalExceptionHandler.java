@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ApiRuntimeException.class)
     public ResponseEntity<String> apiRuntimeExceptionHandler(ApiRuntimeException e) {
-        log.warn("apiRuntimeExceptionHandler: {}", e.getMessage());
+        if (log.isWarnEnabled()) log.warn("apiRuntimeExceptionHandler: {}", e.getMessage());
         return ResponseEntity.status(e.getCode()).body(e.getMessage());
     }
 
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<String> validExceptionHandler(MethodArgumentNotValidException e) {
-        log.warn("validExceptionHandler: {}", e.getMessage());
+        if (log.isWarnEnabled()) log.warn("validExceptionHandler: {}", e.getMessage());
         List<ObjectError> errors = e.getBindingResult().getAllErrors();
         StringBuilder msg = new StringBuilder();
         for (ObjectError error : errors) {
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = AuthorizationException.class)
     public ResponseEntity<String> authorizationExceptionHandler(AuthorizationException e) {
-        log.warn("authorizationExceptionHandler: {}", e.getMessage());
+        if (log.isWarnEnabled()) log.warn("authorizationExceptionHandler: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("未认证");
     }
 
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = UnauthorizedException.class)
     public ResponseEntity<String> unauthorizedExceptionHandler(UnauthorizedException e) {
-        log.warn("unauthorizedExceptionHandler: {}", e.getMessage());
+        if (log.isWarnEnabled()) log.warn("unauthorizedExceptionHandler: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("未授权");
     }
 
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<String> defaultExceptionHandler(Exception e) {
-        log.error("Internal Server Error: {}", e.getMessage(), e);
+        if (log.isErrorEnabled()) log.error("Internal Server Error: {}", e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("服务器异常");
     }
 

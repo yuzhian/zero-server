@@ -43,7 +43,7 @@ public class TokenFilter extends BasicHttpAuthenticationFilter {
             httpServletResponse.setContentType("text/plain; charset=utf-8");
             httpServletResponse.getWriter().write("令牌失效");
         } catch (IOException e) {
-            log.error("token filter on access denied fail", e);
+            if (log.isErrorEnabled()) log.error("token filter on access denied fail", e);
         }
         return false;
     }

@@ -14,7 +14,6 @@ import org.apache.shiro.util.ByteSource;
 import org.springframework.context.annotation.Lazy;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * 系统认证授权配置
@@ -35,12 +34,8 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
         AuthenticationDTO account = accountService.getAuthentication(token.getPrincipal().toString());
-        if (log.isInfoEnabled()) {
-            log.info("AuthenticationInfo: login name[{}], account[{}]", token.getPrincipal(), account);
-        }
-        if (Objects.isNull(account)) {
-            return null;
-        }
+        if (log.isDebugEnabled()) log.debug("authentication: {}", account);
+        if (null == account) return null;
         return new SimpleAuthenticationInfo(
                 account,
                 account.getPassword(),
@@ -58,9 +53,7 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.addRoles(account.getRoles());
         info.addStringPermissions(account.getPermissions());
-        if (log.isDebugEnabled()) {
-            log.debug("AuthorizationInfo: account[{}]", account);
-        }
+        if (log.isDebugEnabled()) log.debug("authorization: {}", account);
         return info;
     }
 }
